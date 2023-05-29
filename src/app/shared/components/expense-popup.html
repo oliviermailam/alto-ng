@@ -1,0 +1,64 @@
+<div class="padding-20">
+  <h3>Entrer une nouvelle dépense</h3>
+
+  <form [formGroup]="newExpenseForm" class="flex-column width-fit-content">
+    <div class="flex-row">
+      <mat-form-field appearance="outline">
+        <mat-label>Nom de la dépense</mat-label>
+        <input matInput type="text" formControlName="name">
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Montant</mat-label>
+        <input matInput type="number" formControlName="amount">
+      </mat-form-field>
+    </div>
+
+    <div class="flex-row">
+      <mat-form-field appearance="outline">
+        <mat-label>Devise</mat-label>
+        <mat-select [formControl]="currency">
+          <mat-option value="EUR">€</mat-option>
+          <mat-option value="USD">$</mat-option>
+          <mat-option value="GBP">£</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Date</mat-label>
+        <input matInput [matDatepicker]="picker" formControlName="date">
+        <mat-hint>JJ/MM/AAAA</mat-hint>
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+    </div>
+
+    <div class="flex-row">
+      <mat-form-field appearance="outline">
+        <mat-label>Catégorie</mat-label>
+        <input matInput type="text" formControlName="category" [matAutocomplete]="auto">
+        <mat-autocomplete #auto="matAutocomplete">
+          <mat-option *ngFor="let category of data.categories" [value]="category">
+            {{category}}
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+    </div>
+
+    <div class="buttons-container">
+      <button
+      type="button"
+      mat-raised-button
+      color="warn"
+      (click)="close()">
+        Annuler
+      </button>
+      <button
+      type="submit"
+      mat-raised-button
+      color="primary"
+      [disabled]="!newExpenseForm.valid || !newExpenseForm.dirty"
+      (click)="save($event)">
+        Enregistrer
+      </button>
+    </div>
+  </form>
+</div>
