@@ -34,10 +34,11 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
   userById = new Map<number, User>();
   selectedUserControl: FormControl<number | null> = new FormControl(null);
 
+  categories: Set<string> = new Set<string>();
   isManager = false;
   subscription: Subscription = new Subscription();
 
-  filterControl = new FormControl<string | null>(null);
+  filterControl = new FormControl<string | null>({value: null, disabled: true});
   displayedColumns = ['name', 'amount', 'date', 'category', 'userName', 'edit', 'delete'];
   allExpenses: IExpenseTableData[] = [];
   dataSource = new MatTableDataSource<IExpenseTableData>([]);
@@ -80,7 +81,13 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
                   userName: newUser.email
                 };
               })
-            )
+            );
+
+            newUser.expenses.forEach(({category}) => {
+              if (category) {
+                this.categories.add(category);
+              }
+            });
           });
 
           this.resetDataSource();
@@ -96,8 +103,12 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
       this.selectedUserControl.valueChanges.subscribe({
         next: (value: number | null) => {
           if (value) {
+            this.filterControl.enable();
             this.isManager = (this.userById.get(value) as User).role === EUserRole.MANAGER;
             this.resetDataSource();
+          } else {
+            this.filterControl.disable();
+            this.isManager = false;
           }
         }
       })
@@ -164,9 +175,7 @@ export class AppComponent implements OnInit, AfterViewInit, OnDestroy {
       }
 
       this.dataSource.data = data;
-      if (this.filterControl.value) {
-        this.dataSource.filter = (this.filterControl.value ?? '').trim().toLowerCase();
-      }
+      this.dataSource.filter = (this.filterControl.value ?? '').trim().toLowerCase();
       this.dataSource.sort = this.sort;
       this.dataSource.paginator = this.paginator;
       this.dataSource.paginator.firstPage();
